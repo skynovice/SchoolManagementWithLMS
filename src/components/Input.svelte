@@ -57,6 +57,12 @@
    */
   export let size = 'md';
 
+  // Generate unique ID for accessibility
+  import { createEventDispatcher } from 'svelte';
+  const dispatch = createEventDispatcher();
+  
+  let inputId = `input-${Math.random().toString(36).substr(2, 9)}`;
+
   // Size classes
   const sizeClasses = {
     sm: 'px-3 py-1.5 text-sm',
@@ -77,7 +83,7 @@
 
 <div class="w-full">
   {#if label}
-    <label class="block text-sm font-medium text-gray-700 mb-2">
+    <label for={inputId} class="block text-sm font-medium text-gray-700 mb-2">
       {label}
       {#if required}
         <span class="text-red-500">*</span>
@@ -87,6 +93,7 @@
   
   {#if type === 'text'}
     <input
+      id={inputId}
       type="text"
       {placeholder}
       {required}
@@ -102,6 +109,7 @@
     />
   {:else if type === 'email'}
     <input
+      id={inputId}
       type="email"
       {placeholder}
       {required}
@@ -117,6 +125,7 @@
     />
   {:else if type === 'password'}
     <input
+      id={inputId}
       type="password"
       {placeholder}
       {required}
@@ -133,6 +142,7 @@
     />
   {:else if type === 'number'}
     <input
+      id={inputId}
       type="number"
       {placeholder}
       {required}
@@ -148,6 +158,7 @@
     />
   {:else if type === 'tel'}
     <input
+      id={inputId}
       type="tel"
       {placeholder}
       {required}
@@ -163,6 +174,7 @@
     />
   {:else if type === 'url'}
     <input
+      id={inputId}
       type="url"
       {placeholder}
       {required}
@@ -178,6 +190,7 @@
     />
   {:else if type === 'search'}
     <input
+      id={inputId}
       type="search"
       {placeholder}
       {required}
@@ -193,6 +206,7 @@
     />
   {:else}
     <input
+      id={inputId}
       type="text"
       {placeholder}
       {required}

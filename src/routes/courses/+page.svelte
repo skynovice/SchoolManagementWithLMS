@@ -12,12 +12,14 @@
   let loading = true;
 
   onMount(async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session }
+    } = await supabase.auth.getSession();
     if (!session) {
       goto('/login');
       return;
     }
-    
+
     user = session.user;
     await loadProfile();
     await loadCourses();
@@ -26,23 +28,17 @@
 
   async function loadProfile() {
     if (!user) return;
-    
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .single();
-    
+
+    const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+
     profile = data;
   }
 
   async function loadCourses() {
     if (!user) return;
-    
+
     try {
-      let query = supabase
-        .from('courses')
-        .select(`
+      let query = supabase.from('courses').select(`
           *,
           subjects (
             name,
@@ -53,7 +49,7 @@
             student_id
           )
         `);
-      
+
       // If teacher, show only their courses
       if (profile?.role === 'teacher') {
         query = query.eq('teacher_id', user.id);
@@ -61,14 +57,14 @@
         // For students/parents, show published courses
         query = query.eq('is_published', true);
       }
-      
+
       const { data, error } = await query.order('created_at', { ascending: false });
-      
+
       if (error) {
         console.error('Error loading courses:', error);
         return;
       }
-      
+
       if (data) {
         courses = data;
       }
@@ -82,7 +78,7 @@
       .from('courses')
       .update({ is_published: !currentStatus })
       .eq('id', courseId);
-    
+
     if (!error) {
       await loadCourses();
     }
@@ -90,11 +86,8 @@
 
   async function deleteCourse(courseId) {
     if (confirm('คุณแน่ใจหรือไม่ที่จะลบหลักสูตรนี้?')) {
-      const { error } = await supabase
-        .from('courses')
-        .delete()
-        .eq('id', courseId);
-      
+      const { error } = await supabase.from('courses').delete().eq('id', courseId);
+
       if (!error) {
         await loadCourses();
       }
@@ -103,13 +96,11 @@
 
   async function enrollCourse(courseId) {
     try {
-      const { error } = await supabase
-        .from('course_enrollments')
-        .insert({
-          course_id: courseId,
-          student_id: user.id
-        });
-      
+      const { error } = await supabase.from('course_enrollments').insert({
+        course_id: courseId,
+        student_id: user.id
+      });
+
       if (!error) {
         await loadCourses();
         alert('ลงทะเบียนเรียบร้อยแล้ว!');
@@ -124,13 +115,97 @@
   }
 
   function isEnrolled(course) {
-    return course.course_enrollments?.some((e) => e.student_id === user.id);
+    return course.course_enrollments?.some(e => e.student_id === user.id);
   }
 
   function getEnrollmentCount(course) {
     return course.course_enrollments?.length || 0;
   }
 </script>
+
+<div class="courses-container">
+  <div class="page-header">
+    <h1 class="page-title">
+      {profile?.role === 'teacher' ? 'หลักสูตรของฉัน' : 'หลักสูตรทั้งหมด'}
+    </h1>
+    {#if profile?.role === 'teacher'}
+      <a href="/courses/create" class="btn-primary"> สร้างหลักสูตรใหม่ </a>
+    {/if}
+  </div>
+
+  {#if loading}
+    <div class="loading">กำลังโหลดข้อมูล...</div>
+  {:else if courses.length === 0}
+    <div class="empty-state">
+      <p>
+        {profile?.role === 'teacher' ? 'คุณยังไม่มีหลักสูตร' : 'ยังไม่มีหลักสูตรในระบบ'}
+      </p>
+      {#if profile?.role === 'teacher'}
+        <a href="/courses/create" class="btn-primary"> สร้างหลักสูตรแรก </a>
+      {/if}
+    </div>
+  {:else}
+    <div class="courses-grid">
+      {#each courses as course}
+        <div class="course-card">
+          <div class="course-header">
+            <div class="course-title">{course.title}</div>
+            <div class="course-subject">
+              {course.subjects?.code} - {course.subjects?.name}
+            </div>
+          </div>
+
+          <div class="course-body">
+            <div class="course-description">
+              {course.description || 'ไม่มีคำอธิบาย'}
+            </div>
+
+            <div class="course-meta">
+              <div class="course-status">
+                <span
+                  class="status-badge {course.is_published ? 'status-published' : 'status-draft'}"
+                >
+                  {course.is_published ? 'เผยแพร่แล้ว' : 'ร่าง'}
+                </span>
+                <span>👥 {getEnrollmentCount(course)} คน</span>
+              </div>
+              <div>
+                {new Date(course.created_at).toLocaleDateString('th-TH')}
+              </div>
+            </div>
+
+            <div class="course-actions">
+              <a href="/lms/course/{course.id}" class="btn-small btn-view"> 👁️ ดู </a>
+
+              {#if profile?.role === 'teacher' && course.teacher_id === user.id}
+                <a href="/lms/edit/{course.id}" class="btn-small btn-edit"> ✏️ แก้ไข </a>
+
+                <button
+                  class="btn-small {course.is_published ? 'btn-unpublish' : 'btn-publish'}"
+                  on:click={() => togglePublish(course.id, course.is_published)}
+                >
+                  {course.is_published ? '📤 ยกเลิกเผยแพร่' : '📢 เผยแพร่'}
+                </button>
+
+                <button class="btn-small btn-delete" on:click={() => deleteCourse(course.id)}>
+                  🗑️ ลบ
+                </button>
+              {:else if profile?.role === 'student'}
+                {#if isEnrolled(course)}
+                  <button class="btn-small btn-enrolled" disabled> ✅ ลงทะเบียนแล้ว </button>
+                {:else}
+                  <button class="btn-small btn-enroll" on:click={() => enrollCourse(course.id)}>
+                    📝 ลงทะเบียน
+                  </button>
+                {/if}
+              {/if}
+            </div>
+          </div>
+        </div>
+      {/each}
+    </div>
+  {/if}
+</div>
 
 <style>
   .courses-container {
@@ -392,8 +467,13 @@
 
   /* Animation for loading */
   @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
   }
 
   .loading {
@@ -413,103 +493,3 @@
     border-radius: 20px;
   }
 </style>
-
-<div class="courses-container">
-  <div class="page-header">
-    <h1 class="page-title">
-      {profile?.role === 'teacher' ? 'หลักสูตรของฉัน' : 'หลักสูตรทั้งหมด'}
-    </h1>
-    {#if profile?.role === 'teacher'}
-      <a href="/courses/create" class="btn-primary">
-        สร้างหลักสูตรใหม่
-      </a>
-    {/if}
-  </div>
-
-  {#if loading}
-    <div class="loading">กำลังโหลดข้อมูล...</div>
-  {:else if courses.length === 0}
-    <div class="empty-state">
-      <p>
-        {profile?.role === 'teacher' 
-          ? 'คุณยังไม่มีหลักสูตร' 
-          : 'ยังไม่มีหลักสูตรในระบบ'}
-      </p>
-      {#if profile?.role === 'teacher'}
-        <a href="/courses/create" class="btn-primary">
-          สร้างหลักสูตรแรก
-        </a>
-      {/if}
-    </div>
-  {:else}
-    <div class="courses-grid">
-      {#each courses as course}
-        <div class="course-card">
-          <div class="course-header">
-            <div class="course-title">{course.title}</div>
-            <div class="course-subject">
-              {course.subjects?.code} - {course.subjects?.name}
-            </div>
-          </div>
-          
-          <div class="course-body">
-            <div class="course-description">
-              {course.description || 'ไม่มีคำอธิบาย'}
-            </div>
-            
-            <div class="course-meta">
-              <div class="course-status">
-                <span class="status-badge {course.is_published ? 'status-published' : 'status-draft'}">
-                  {course.is_published ? 'เผยแพร่แล้ว' : 'ร่าง'}
-                </span>
-                <span>👥 {getEnrollmentCount(course)} คน</span>
-              </div>
-              <div>
-                {new Date(course.created_at).toLocaleDateString('th-TH')}
-              </div>
-            </div>
-            
-            <div class="course-actions">
-              <a href="/lms/course/{course.id}" class="btn-small btn-view">
-                👁️ ดู
-              </a>
-              
-              {#if profile?.role === 'teacher' && course.teacher_id === user.id}
-                <a href="/lms/edit/{course.id}" class="btn-small btn-edit">
-                  ✏️ แก้ไข
-                </a>
-                
-                <button 
-                  class="btn-small {course.is_published ? 'btn-unpublish' : 'btn-publish'}"
-                  on:click={() => togglePublish(course.id, course.is_published)}
-                >
-                  {course.is_published ? '📤 ยกเลิกเผยแพร่' : '📢 เผยแพร่'}
-                </button>
-                
-                <button 
-                  class="btn-small btn-delete"
-                  on:click={() => deleteCourse(course.id)}
-                >
-                  🗑️ ลบ
-                </button>
-              {:else if profile?.role === 'student'}
-                {#if isEnrolled(course)}
-                  <button class="btn-small btn-enrolled" disabled>
-                    ✅ ลงทะเบียนแล้ว
-                  </button>
-                {:else}
-                  <button 
-                    class="btn-small btn-enroll"
-                    on:click={() => enrollCourse(course.id)}
-                  >
-                    📝 ลงทะเบียน
-                  </button>
-                {/if}
-              {/if}
-            </div>
-          </div>
-        </div>
-      {/each}
-    </div>
-  {/if}
-</div>
