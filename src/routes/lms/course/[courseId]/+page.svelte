@@ -225,7 +225,7 @@
           </div>
         {/if}
       {/if}
-    </Card>
+    </div>
 
     <!-- Course Content -->
     <Card class="p-6">

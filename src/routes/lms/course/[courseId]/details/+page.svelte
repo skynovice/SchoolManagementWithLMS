@@ -266,7 +266,7 @@
             </Button>
           </div>
         {/if}
-      </Card>
+      </div>
 
       <!-- Learning Activities -->
       {#if activities.length > 0}
@@ -342,7 +342,7 @@
             </div>
           {/if}
         </div>
-      </div>
+      </Card>
     {/if}
 
     <!-- Actions -->
