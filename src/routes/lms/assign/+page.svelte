@@ -8,7 +8,7 @@
   import LoadingSpinner from '$components/LoadingSpinner.svelte';
 
   // Accept params prop to avoid warnings
-  export let params = {};
+  export const params = {};
 
   let user = null;
   let profile = null;
@@ -198,10 +198,11 @@
         <form on:submit|preventDefault={handleSubmit} class="space-y-6">
           <!-- Course Selection -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label for="course_id" class="block text-sm font-medium text-gray-700 mb-2">
               เลือกหลักสูตร <span class="text-red-500">*</span>
             </label>
             <select 
+              id="course_id"
               bind:value={formData.course_id}
               required
               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -253,10 +254,11 @@
 
           <!-- Target Selection -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label for="assigned_to_id" class="block text-sm font-medium text-gray-700 mb-2">
               เลือกเป้าหมาย <span class="text-red-500">*</span>
             </label>
             <select 
+              id="assigned_to_id"
               bind:value={formData.assigned_to_id}
               required
               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -277,10 +279,11 @@
 
           <!-- Instructions -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label for="instructions" class="block text-sm font-medium text-gray-700 mb-2">
               คำแนะนำเพิ่มเติม
             </label>
             <textarea
+              id="instructions"
               bind:value={formData.instructions}
               rows="4"
               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"

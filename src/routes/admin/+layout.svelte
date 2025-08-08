@@ -7,7 +7,7 @@
   import Card from '$components/Card.svelte';
 
   // Accept params prop to avoid warnings
-  export let params = {};
+  export const params = {};
 
   let user = null;
   let profile = null;

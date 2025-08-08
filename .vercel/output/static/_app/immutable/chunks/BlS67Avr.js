@@ -1,1 +1,0 @@
-const a=()=>Math.random().toString(36).substring(2)+Date.now().toString(36),n=t=>({super_admin:"ผู้ดูแลระบบสูงสุด",admin:"ผู้ดูแลระบบ",teacher:"ครู",parent:"ผู้ปกครอง",student:"นักเรียน"})[t]||t;export{a,n as g};

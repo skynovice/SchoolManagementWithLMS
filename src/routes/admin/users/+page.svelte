@@ -327,8 +327,8 @@
 </div>
 
 {#if showCreateModal}
-  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" on:click={closeModal}>
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto" on:click|stopPropagation>
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" role="dialog" aria-modal="true" on:click={closeModal} on:keydown={(e) => e.key === 'Escape' && closeModal()}>
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto" role="document" on:click|stopPropagation>
       <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-2xl">
         <div class="flex items-center justify-between">
           <h2 class="text-xl font-bold text-gray-800">

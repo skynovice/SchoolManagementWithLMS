@@ -108,8 +108,9 @@
         <div class="p-6 space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">ชื่อโรงเรียน</label>
+              <label for="school_name" class="block text-sm font-semibold text-gray-700 mb-2">ชื่อโรงเรียน</label>
               <input
+                id="school_name"
                 type="text"
                 bind:value={settings.school_name}
                 placeholder="ชื่อโรงเรียน"
@@ -117,8 +118,9 @@
               />
             </div>
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">เบอร์โทรศัพท์</label>
+              <label for="school_phone" class="block text-sm font-semibold text-gray-700 mb-2">เบอร์โทรศัพท์</label>
               <input
+                id="school_phone"
                 type="tel"
                 bind:value={settings.school_phone}
                 placeholder="0X-XXXX-XXXX"

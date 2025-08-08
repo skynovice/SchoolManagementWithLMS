@@ -141,8 +141,8 @@
 {/if}
 
 {#if showCreateModal}
-  <div class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50" on:click={closeModal}>
-    <div class="bg-white p-8 rounded-xl w-full max-w-md mx-4" on:click|stopPropagation>
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50" role="dialog" aria-modal="true" on:click={closeModal} on:keydown={(e) => e.key === 'Escape' && closeModal()}>
+    <div class="bg-white p-8 rounded-xl w-full max-w-md mx-4" role="document" on:click|stopPropagation>
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-xl font-semibold text-gray-900">
           {editingZone ? 'แก้ไขโซน' : 'เพิ่มโซนใหม่'}
