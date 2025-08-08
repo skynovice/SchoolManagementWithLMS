@@ -1,9 +1,12 @@
 # Ignore build artifacts and cache
 .svelte-kit/
-.vercel/
 node_modules/
 build/
 dist/
+
+# Ignore Vercel cache but keep output
+.vercel/project.json
+.vercel/.env*
 
 # Ignore local environment files
 .env.local
