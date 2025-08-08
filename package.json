@@ -10,7 +10,8 @@
     "build": "vite build",
     "dev": "vite dev",
     "preview": "vite preview",
-    "create-users": "node scripts/create-users.js"
+    "create-users": "node scripts/create-users.js",
+    "vercel-build": "vite build"
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "^3.0.0",
